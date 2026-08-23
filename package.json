@@ -25,7 +25,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ayush-seabuddy/semantic-release-posthog.git"
+    "url": "https://github.com/ayushjaipuriyar/semantic-release-posthog.git"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
