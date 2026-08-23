@@ -1,0 +1,54 @@
+{
+  "name": "semantic-release-posthog",
+  "version": "0.0.0-development",
+  "description": "semantic-release plugin that creates a PostHog annotation for every release, mirroring your commit-analyzer configuration exactly",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "files": [
+    "index.js",
+    "lib/"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "semantic-release",
+    "semantic-release-plugin",
+    "posthog",
+    "annotations",
+    "conventional-commits"
+  ],
+  "author": "Ayush Jaipuriyar <ayush.jai@seabuddy.co>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ayush-seabuddy/semantic-release-posthog.git"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepare": "npm run build",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "conventional-commits-filter": "^5.0.0",
+    "conventional-commits-parser": "^6.1.0"
+  },
+  "peerDependencies": {
+    "@semantic-release/commit-analyzer": ">=8.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@semantic-release/commit-analyzer": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@types/node": "^22.20.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
