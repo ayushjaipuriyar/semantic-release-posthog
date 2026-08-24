@@ -34,7 +34,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "conventional-commits-filter": "^5.0.0",
+    "conventional-commits-filter": "^6.0.1",
     "conventional-commits-parser": "^7.1.2"
   },
   "peerDependencies": {
