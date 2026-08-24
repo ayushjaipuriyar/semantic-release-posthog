@@ -34,7 +34,7 @@ export default {
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
     "@semantic-release/github",
-    ["semantic-release-posthog", { projectId: 252204 }],
+    "semantic-release-posthog",
   ],
 };
 ```
@@ -62,16 +62,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           POSTHOG_TOKEN: ${{ secrets.POSTHOG_TOKEN }}
+          POSTHOG_PROJECT_ID: ${{ secrets.POSTHOG_PROJECT_ID }}
 ```
 
 Create a personal API key at https://us.posthog.com/settings/user-api-keys and store it as the
-`POSTHOG_TOKEN` repository secret.
+`POSTHOG_TOKEN` repository secret. Set `POSTHOG_PROJECT_ID` to your PostHog project id — keeping
+both in secrets means nothing project-specific is committed to the repo.
 
 ## Options
 
 | Option          | Default                 | Description                                                       |
 | --------------- | ----------------------- | ----------------------------------------------------------------- |
-| `projectId`     | `POSTHOG_PROJECT_ID` env | PostHog project id                                               |
+| `projectId`     | `POSTHOG_PROJECT_ID` env | PostHog project id — prefer the env/secret over hardcoding        |
 | `host`          | `https://us.posthog.com`| PostHog base URL                                                  |
 | `scope`         | `"project"`             | Annotation scope (`project` or `organization`)                    |
 | `emoji`         | by release type 💥/🚀/🩹/🏷️ | Force one emoji for all annotations                            |

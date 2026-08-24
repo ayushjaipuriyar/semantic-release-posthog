@@ -5,7 +5,8 @@ export default {
     "@semantic-release/release-notes-generator",
     "@semantic-release/github",
     "@semantic-release/npm",
-    // Dogfooding via file: self-dependency (switch to registry version after first publish).
-    ["semantic-release-posthog", { optional: true }],
+    // Dogfooding via local dist path — resolves before first CI publish;
+    // switch to the published version string once we want CI to test the shipped artifact.
+    ["./dist/index.js", { optional: true }],
   ],
 };
