@@ -6,7 +6,7 @@ on:
 
 permissions:
   contents: write
-  id-token: write
+  id-token: write # OIDC trusted publishing to npm
 
 concurrency:
   group: release-${{ github.ref }}
@@ -21,10 +21,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          registry-url: https://registry.npmjs.org/
+          # NOTE: no registry-url here — an auto-generated .npmrc conflicts
+          # with @semantic-release/npm auth (documented EINVALIDNPMTOKEN trap)
       - run: npm ci
       - run: npx semantic-release@24
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           POSTHOG_TOKEN: ${{ secrets.POSTHOG_TOKEN }}
+          POSTHOG_PROJECT_ID: ${{ secrets.POSTHOG_PROJECT_ID }}
