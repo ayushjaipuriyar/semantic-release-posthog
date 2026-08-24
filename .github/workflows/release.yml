@@ -24,7 +24,9 @@ jobs:
           # NOTE: no registry-url here — an auto-generated .npmrc conflicts
           # with @semantic-release/npm auth (documented EINVALIDNPMTOKEN trap)
       - run: npm ci
-      - run: npx semantic-release@24
+      # @25 required: bundles @semantic-release/npm v13 (OIDC trusted publishing);
+      # v24's npm plugin v12 predates it and fails with ENONPMTOKEN
+      - run: npx semantic-release@25
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           POSTHOG_TOKEN: ${{ secrets.POSTHOG_TOKEN }}
