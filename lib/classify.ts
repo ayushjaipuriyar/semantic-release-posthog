@@ -98,3 +98,20 @@ export function pickSubjects(classified: ClassifiedCommit[]): string[] {
   }
   return minor.length > 0 ? minor : patch;
 }
+
+const BREAKING_NOTE = /^BREAKING[ -]CHANGE/i;
+
+/**
+ * Collect human-readable breaking-change descriptions from classified commits.
+ * Only BREAKING CHANGE footers count — exactly what the analyzer treats as
+ * breaking. A bare `!` without a footer is not classified as breaking by the
+ * default preset, so it is intentionally not reported here (parity guarantee).
+ */
+export function extractBreakingChanges(classified: ClassifiedCommit[]): string[] {
+  const changes: string[] = [];
+  for (const { parsed } of classified) {
+    const note = (parsed?.notes ?? []).find((n) => BREAKING_NOTE.test(n.title));
+    if (note?.text?.trim()) changes.push(note.text.trim());
+  }
+  return changes;
+}

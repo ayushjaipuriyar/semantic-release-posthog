@@ -47,24 +47,76 @@ export interface PosthogRuntimeOptions {
   host: string;
   scope: "project" | "organization";
   emoji: string | undefined;
+  emojiMap: Record<string, string> | undefined;
   maxFeatures: number;
+  maxSubjects: number | undefined;
+  maxSubjectLength: number | undefined;
+  subjectsJoiner: string | undefined;
+  contentTemplate: string | undefined;
+  format: "single-line" | "multi-line";
+  include:
+    | {
+        version?: boolean;
+        releaseType?: boolean;
+        subjects?: boolean;
+        breakingChanges?: boolean;
+        environment?: boolean;
+        links?: boolean;
+      }
+    | undefined;
+  skipPatch: boolean;
+  dryRun: boolean;
+  debug: boolean;
   optional: boolean;
+  environment: string | undefined;
+  privacy:
+    | {
+        patterns?: RegExp[];
+        replacement?: string;
+        disableDefaults?: boolean;
+      }
+    | undefined;
+  idempotency: {
+    enabled: boolean;
+    strategy: "version" | "version-environment";
+  };
 }
 
 export function resolvePosthogOptions(
-  pluginConfig: { projectId?: number; host?: string; scope?: "project" | "organization"; emoji?: string; maxFeatures?: number; optional?: boolean } = {},
+  pluginConfig: Record<string, unknown> | object = {},
   context: { env?: Record<string, string | undefined> } = {}
 ): PosthogRuntimeOptions {
+  const cfg = pluginConfig as Record<string, unknown>;
   const env = context.env ?? process.env;
-  const rawProjectId = pluginConfig.projectId ?? (env.POSTHOG_PROJECT_ID ? Number(env.POSTHOG_PROJECT_ID) : undefined);
+  const rawProjectId =
+    (cfg.projectId as number | undefined) ??
+    (env.POSTHOG_PROJECT_ID ? Number(env.POSTHOG_PROJECT_ID) : undefined);
   return {
     token: env.POSTHOG_TOKEN,
     projectId: Number.isFinite(rawProjectId) ? rawProjectId : undefined,
-    host: (pluginConfig.host ?? "https://us.posthog.com").replace(/\/+$/, ""),
-    scope: pluginConfig.scope ?? "project",
-    emoji: pluginConfig.emoji,
-    maxFeatures: pluginConfig.maxFeatures ?? 3,
-    optional: pluginConfig.optional ?? false,
+    host: ((cfg.host as string | undefined) ?? "https://us.posthog.com").replace(/\/+$/, ""),
+    scope: (cfg.scope ?? "project") as PosthogRuntimeOptions["scope"],
+    emoji: cfg.emoji as string | undefined,
+    emojiMap: cfg.emojiMap as Record<string, string> | undefined,
+    maxFeatures: (cfg.maxFeatures as number | undefined) ?? 3,
+    maxSubjects: cfg.maxSubjects as number | undefined,
+    maxSubjectLength: cfg.maxSubjectLength as number | undefined,
+    subjectsJoiner: cfg.subjectsJoiner as string | undefined,
+    contentTemplate: cfg.contentTemplate as string | undefined,
+    format: (cfg.format as PosthogRuntimeOptions["format"] | undefined) ?? "single-line",
+    include: cfg.include as PosthogRuntimeOptions["include"],
+    skipPatch: Boolean(cfg.skipPatch),
+    dryRun: Boolean(cfg.dryRun),
+    debug: Boolean(cfg.debug),
+    optional: Boolean(cfg.optional),
+    environment: cfg.environment as string | undefined,
+    privacy: cfg.privacy as PosthogRuntimeOptions["privacy"],
+    idempotency: {
+      enabled: (cfg.idempotency as { enabled?: boolean } | undefined)?.enabled ?? true,
+      strategy:
+        (cfg.idempotency as { strategy?: "version" | "version-environment" } | undefined)?.strategy ??
+        "version-environment",
+    },
   };
 }
 

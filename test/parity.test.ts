@@ -1,8 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { classifyCommits, pickSubjects } from "../lib/classify.js";
+import { classifyCommits, pickSubjects, extractBreakingChanges, type ClassifiedCommit } from "../lib/classify.js";
 import { resolveAnalyzerConfig } from "../lib/analyzer-config.js";
 
 const commit = (message: string) => ({ hash: message.slice(0, 8), message });
+
+const classified = (header: string, releaseType: string | null): ClassifiedCommit =>
+  ({ commit: commit(header), parsed: { header } as never, releaseType }) as unknown as ClassifiedCommit;
 
 describe("classifyCommits parity with @semantic-release/commit-analyzer", () => {
   it("classifies feat/fix/chore like the default angular preset", async () => {
@@ -65,16 +68,41 @@ describe("classifyCommits parity with @semantic-release/commit-analyzer", () => 
 describe("pickSubjects", () => {
   it("prefers minor (features) over patch (fixes)", () => {
     const subjects = pickSubjects([
-      { commit: commit("x"), parsed: { header: "feat: a" }, releaseType: "minor" },
-      { commit: commit("y"), parsed: { header: "fix: b" }, releaseType: "patch" },
+      classified("feat: a", "minor"),
+      classified("fix: b", "patch"),
     ]);
     expect(subjects).toEqual(["feat: a"]);
   });
 
   it("falls back to fixes when there are no features", () => {
-    const subjects = pickSubjects([
-      { commit: commit("y"), parsed: { header: "fix: b" }, releaseType: "patch" },
-    ]);
+    const subjects = pickSubjects([classified("fix: b", "patch")]);
     expect(subjects).toEqual(["fix: b"]);
+  });
+});
+
+describe("extractBreakingChanges", () => {
+  it("extracts BREAKING CHANGE footer text", async () => {
+    const classified = await classifyCommits({}, [
+      commit("feat(api): new auth\n\nBREAKING CHANGE: requires Bearer tokens"),
+      commit("fix: padding"),
+    ]);
+    expect(extractBreakingChanges(classified)).toEqual(["requires Bearer tokens"]);
+  });
+
+  it("never invents breaking changes the analyzer did not classify", async () => {
+    // feat! without a BREAKING CHANGE footer is NOT major per the default
+    // preset — the plugin must mirror that exactly (parity guarantee).
+    const classified = await classifyCommits({}, [commit("feat!: drop node 16")]);
+    expect(classified[0].releaseType).toBeNull();
+    expect(extractBreakingChanges(classified)).toEqual([]);
+  });
+
+  it("returns an empty list when nothing is breaking", async () => {
+    const classified = await classifyCommits({}, [
+      commit("feat: search"),
+      commit("fix: crash"),
+      commit("chore: deps"),
+    ]);
+    expect(extractBreakingChanges(classified)).toEqual([]);
   });
 });
