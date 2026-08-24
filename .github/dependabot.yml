@@ -1,0 +1,22 @@
+version: 2
+updates:
+  # Runtime + dev dependencies of the plugin itself
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      # semantic-release peer range must track what we support, not latest drift
+      - dependency-name: "@semantic-release/commit-analyzer"
+        update-types: ["version-update:semver-major"]
+
+  # Keep action versions current (also fixes the Node 20 deprecation warnings)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
