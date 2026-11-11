@@ -3,13 +3,12 @@
   "version": "1.0.0",
   "description": "semantic-release plugin that creates a PostHog annotation for every release, mirroring your commit-analyzer configuration exactly",
   "type": "module",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "exports": {
-    ".": "./index.js"
+    ".": "./dist/index.js"
   },
   "files": [
-    "index.js",
-    "lib/"
+    "dist/"
   ],
   "engines": {
     "node": ">=18.0.0"
