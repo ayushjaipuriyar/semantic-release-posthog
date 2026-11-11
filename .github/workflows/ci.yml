@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [18, 20, 22]
+        # vitest 5 requires node ^22.12.0; dev-only, runtime engines stay >=18
+        node: [22]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
